@@ -117,13 +117,13 @@ public class WorkerConfig {
     @ServiceActivator(inputChannel = AppConstant.REQUEST, outputChannel = AppConstant.REPLY, autoStartup = "true")
     public ChunkProcessorChunkHandler<Student> chunkProcessorChunkHandler() {
         ChunkProcessorChunkHandler<Student> chunkHandler = new ChunkProcessorChunkHandler<>();
-//        chunkHandler.setChunkProcessor(customChunkProcessor, itemWriter());
-        chunkHandler.setChunkProcessor(
-                new SimpleChunkProcessor<>((transaction) -> {
-                    System.out.println(">> processing transaction: " + transaction);
-                    Thread.sleep(5);
-                    return transaction;
-                }, itemWriter()));
+        chunkHandler.setChunkProcessor(customChunkProcessor);
+//        chunkHandler.setChunkProcessor(
+//                new SimpleChunkProcessor<>((transaction) -> {
+//                    System.out.println(">> processing transaction: " + transaction);
+//                    Thread.sleep(5);
+//                    return transaction;
+//                }, itemWriter()));
 
         return chunkHandler;
     }

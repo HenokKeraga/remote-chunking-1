@@ -10,7 +10,6 @@ public class StudentRowMapper implements RowMapper<Student> {
 
     @Override
     public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
-        System.out.println("*****");
         return Student.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
