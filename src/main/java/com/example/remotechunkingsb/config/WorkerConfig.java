@@ -80,6 +80,7 @@ public class WorkerConfig {
         container.setIdleEventInterval(10000);
         container.setListenerId("queue");
         container.setQueueNames("request");
+
         return container;
     }
 
@@ -90,9 +91,9 @@ public class WorkerConfig {
 //                .get();
 //    }
     @Bean
-    public IntegrationFlow mesagesIn(ConnectionFactory connectionFactory) {
+    public IntegrationFlow mesagesIn(ConnectionFactory connectionFactory,SimpleMessageListenerContainer messageListenerContainer) {
         return IntegrationFlow
-                .from(Amqp.inboundAdapter(connectionFactory, AppConstant.REQUEST))
+                .from(Amqp.inboundAdapter(messageListenerContainer))
                 .channel(request())
                 .get();
     }
@@ -134,7 +135,7 @@ public class WorkerConfig {
         return new ItemWriter<Student>() {
             @Override
             public void write(Chunk<? extends Student> chunk) throws Exception {
-                chunk.getItems().forEach(System.out::println);
+                //chunk.getItems().forEach(System.out::println);
             }
         };
     }
