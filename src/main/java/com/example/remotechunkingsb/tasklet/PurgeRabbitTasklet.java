@@ -1,6 +1,7 @@
 package com.example.remotechunkingsb.tasklet;
 
 import com.example.remotechunkingsb.service.PurgeQueueService;
+import com.example.remotechunkingsb.util.AppConstant;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -20,8 +21,8 @@ public class PurgeRabbitTasklet implements Tasklet {
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         List<String> queueNames = new ArrayList<>();
-        queueNames.add("request");
-        queueNames.add("reply");
+        queueNames.add(AppConstant.REPLY);
+        queueNames.add(AppConstant.REQUEST);
 
         purgeQueueService.purgeQueue(queueNames);
 
