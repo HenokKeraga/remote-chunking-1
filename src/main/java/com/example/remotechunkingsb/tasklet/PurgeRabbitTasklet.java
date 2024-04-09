@@ -21,8 +21,8 @@ public class PurgeRabbitTasklet implements Tasklet {
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         List<String> queueNames = new ArrayList<>();
-        queueNames.add(AppConstant.QUEUE_REPLY);
-        queueNames.add(AppConstant.QUEUE_REQUEST);
+        queueNames.add(AppConstant.REPLY_QUEUE);
+        queueNames.add(AppConstant.REQUEST_QUEUE);
 
         purgeQueueService.purgeQueue(queueNames);
 

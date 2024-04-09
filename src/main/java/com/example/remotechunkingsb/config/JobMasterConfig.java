@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.amqp.dsl.Amqp;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -145,7 +144,7 @@ public class JobMasterConfig {
     @Bean
     public IntegrationFlow messageIn(ConnectionFactory connectionFactory,QueueChannel reply) {
         return IntegrationFlow
-                .from(Amqp.inboundAdapter(connectionFactory, AppConstant.QUEUE_REPLY))
+                .from(Amqp.inboundAdapter(connectionFactory, AppConstant.REPLY_QUEUE))
                 .channel(reply)
                 .get();
     }
@@ -154,7 +153,7 @@ public class JobMasterConfig {
     public IntegrationFlow messageOut(AmqpTemplate amqpTemplate) {
         return IntegrationFlow.from(AppConstant.CHANNEL_REQUEST)
                 .handle(Amqp.outboundAdapter(amqpTemplate)
-                        .routingKey(AppConstant.QUEUE_REQUEST))
+                        .routingKey(AppConstant.REQUEST_QUEUE))
                 .get();
     }
     @Bean

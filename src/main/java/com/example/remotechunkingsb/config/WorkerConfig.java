@@ -34,7 +34,7 @@ public class WorkerConfig {
         container.setPrefetchCount(1);
         container.setIdleEventInterval(10000);
         container.setListenerId("queue");
-        container.setQueueNames(AppConstant.QUEUE_REQUEST);
+        container.setQueueNames(AppConstant.REQUEST_QUEUE);
 
         return container;
     }
@@ -55,7 +55,7 @@ public class WorkerConfig {
     public IntegrationFlow messageOut(AmqpTemplate template) {
         return IntegrationFlow.from(AppConstant.CHANNEL_REPLY)
                 .handle(Amqp.outboundAdapter(template)
-                        .routingKey(AppConstant.QUEUE_REPLY))
+                        .routingKey(AppConstant.REPLY_QUEUE))
                 .get();
     }
 
