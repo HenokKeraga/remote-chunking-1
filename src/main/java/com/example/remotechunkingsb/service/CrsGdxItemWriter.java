@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class CrsGdxItemWriter implements ItemWriter<Student> {
     @Override
     public void write(Chunk<? extends Student> chunk) throws Exception {
-        chunk.getItems().forEach(System.out::println);
+        chunk.getItems().forEach(item -> System.out.println("CrsGdxItemWriter "+item));
+
     }
 }
