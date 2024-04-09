@@ -129,14 +129,7 @@ public class JobMasterConfig {
     }
 
 
-// configure messaging gateway
-    @Bean
-    public MessagingTemplate messagingTemplate(DirectChannel request) {
-        MessagingTemplate template = new MessagingTemplate();
-        template.setDefaultChannel(request);
-        template.setReceiveTimeout(2000);
-        return template;
-    }
+
 
     @Bean
     public TaskExecutor taskExecutorCustom() {
@@ -165,7 +158,8 @@ public class JobMasterConfig {
                 .get();
     }
     @Bean
-    public ChunkMessageChannelItemWriter<Student> itemWriter(QueueChannel reply,MessagingTemplate messagingTemplate) {
+    public ChunkMessageChannelItemWriter<Student> itemWriter(QueueChannel reply,
+                                                             MessagingTemplate messagingTemplate) {
         var chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter<Student>();
         chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate);
 

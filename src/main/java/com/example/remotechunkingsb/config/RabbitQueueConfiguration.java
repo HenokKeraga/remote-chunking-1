@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.core.MessagingTemplate;
 
 
 @Configuration
@@ -47,6 +48,15 @@ public class RabbitQueueConfiguration {
     @Bean
     Binding requestBinding(TopicExchange exchange, Queue requestQueue) {
         return BindingBuilder.bind(requestQueue).to(exchange).with(AppConstant.QUEUE_REQUEST);
+    }
+
+    // configure messaging gateway
+    @Bean
+    public MessagingTemplate messagingTemplate(DirectChannel request) {
+        MessagingTemplate template = new MessagingTemplate();
+        template.setDefaultChannel(request);
+        template.setReceiveTimeout(2000);
+        return template;
     }
 
 
