@@ -46,7 +46,7 @@ public class WorkerConfig {
 //                .get();
 //    }
     @Bean
-    public IntegrationFlow mesagesIn(SimpleMessageListenerContainer messageListenerContainer,
+    public IntegrationFlow messagesIn(SimpleMessageListenerContainer messageListenerContainer,
                                      DirectChannel request) {
         return IntegrationFlow
                 .from(Amqp.inboundAdapter(messageListenerContainer))
@@ -63,7 +63,7 @@ public class WorkerConfig {
 //    }
 
     @Bean
-    public IntegrationFlow outgoingReplies(AmqpTemplate template) {
+    public IntegrationFlow messageOut(AmqpTemplate template) {
         return IntegrationFlow.from(AppConstant.CHANNEL_REPLY)
                 .handle(Amqp.outboundAdapter(template)
                         .routingKey(AppConstant.QUEUE_REPLY))

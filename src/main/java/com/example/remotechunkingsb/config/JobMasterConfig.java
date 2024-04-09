@@ -150,7 +150,7 @@ public class JobMasterConfig {
 
 
     @Bean
-    public IntegrationFlow replyFlow(ConnectionFactory connectionFactory,QueueChannel reply) {
+    public IntegrationFlow messageIn(ConnectionFactory connectionFactory,QueueChannel reply) {
         return IntegrationFlow
                 .from(Amqp.inboundAdapter(connectionFactory, AppConstant.QUEUE_REPLY))
                 .channel(reply)
@@ -158,7 +158,7 @@ public class JobMasterConfig {
     }
 
     @Bean
-    public IntegrationFlow outboundFlow(AmqpTemplate amqpTemplate) {
+    public IntegrationFlow messageOut(AmqpTemplate amqpTemplate) {
         return IntegrationFlow.from(AppConstant.CHANNEL_REQUEST)
                 .handle(Amqp.outboundAdapter(amqpTemplate)
                         .routingKey(AppConstant.QUEUE_REQUEST))
