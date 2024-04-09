@@ -39,12 +39,7 @@ public class WorkerConfig {
         return container;
     }
 
-    //    @Bean
-//    public IntegrationFlow messageIn(SimpleMessageListenerContainer messageListenerContainer) {
-//        return IntegrationFlow.from(Amqp.inboundAdapter(messageListenerContainer))
-//                .channel(orcRequests())
-//                .get();
-//    }
+
     @Bean
     public IntegrationFlow messagesIn(SimpleMessageListenerContainer messageListenerContainer,
                                      DirectChannel request) {
@@ -55,12 +50,6 @@ public class WorkerConfig {
     }
 
 
-//    @Bean
-//    public IntegrationFlow outgoingReplies(RabbitTemplate rabbitTemplate) {
-//        return IntegrationFlow.from(orcRequests()) // Using the channel bean directly
-//                .handle(Amqp.outboundAdapter(rabbitTemplate).routingKey(AppConstant.REPLY))
-//                .get();
-//    }
 
     @Bean
     public IntegrationFlow messageOut(AmqpTemplate template) {
