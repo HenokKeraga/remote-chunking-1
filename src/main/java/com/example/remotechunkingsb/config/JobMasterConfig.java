@@ -128,20 +128,12 @@ public class JobMasterConfig {
                 .build();
     }
 
-    @Bean
-    public DirectChannel request() {
-        return new DirectChannel();
-    }
 
-    @Bean
-    public QueueChannel reply() {
-        return new QueueChannel();
-    }
 // configure messaging gateway
     @Bean
-    public MessagingTemplate messagingTemplate() {
+    public MessagingTemplate messagingTemplate(DirectChannel request) {
         MessagingTemplate template = new MessagingTemplate();
-        template.setDefaultChannel(request());
+        template.setDefaultChannel(request);
         template.setReceiveTimeout(2000);
         return template;
     }
@@ -158,10 +150,10 @@ public class JobMasterConfig {
 
 
     @Bean
-    public IntegrationFlow replyFlow(ConnectionFactory connectionFactory) {
+    public IntegrationFlow replyFlow(ConnectionFactory connectionFactory,QueueChannel reply) {
         return IntegrationFlow
                 .from(Amqp.inboundAdapter(connectionFactory, AppConstant.QUEUE_REPLY))
-                .channel(reply())
+                .channel(reply)
                 .get();
     }
 
@@ -173,11 +165,11 @@ public class JobMasterConfig {
                 .get();
     }
     @Bean
-    public ChunkMessageChannelItemWriter<Student> itemWriter() {
+    public ChunkMessageChannelItemWriter<Student> itemWriter(QueueChannel reply,MessagingTemplate messagingTemplate) {
         var chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter<Student>();
-        chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate());
+        chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate);
 
-        chunkMessageChannelItemWriter.setReplyChannel(reply());
+        chunkMessageChannelItemWriter.setReplyChannel(reply);
         chunkMessageChannelItemWriter.setThrottleLimit(100);
         chunkMessageChannelItemWriter.setMaxWaitTimeouts(800000);
 
@@ -185,9 +177,9 @@ public class JobMasterConfig {
     }
 
     @Bean
-    public RemoteChunkHandlerFactoryBean<Student> chunkHandler(TaskletStep prcPacProcessStep) {
+    public RemoteChunkHandlerFactoryBean<Student> chunkHandler(TaskletStep prcPacProcessStep,ChunkMessageChannelItemWriter<Student> itemWriter) {
         RemoteChunkHandlerFactoryBean<Student> remoteChunkHandlerFactoryBean = new RemoteChunkHandlerFactoryBean<>();
-        remoteChunkHandlerFactoryBean.setChunkWriter(itemWriter());
+        remoteChunkHandlerFactoryBean.setChunkWriter(itemWriter);
         remoteChunkHandlerFactoryBean.setStep(prcPacProcessStep);
         return remoteChunkHandlerFactoryBean;
     }

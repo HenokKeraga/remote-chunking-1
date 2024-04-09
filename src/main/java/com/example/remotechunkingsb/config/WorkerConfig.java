@@ -26,22 +26,6 @@ public class WorkerConfig {
     }
 
 
-
-    @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange("remote-chunking-exchange");
-    }
-
-    @Bean
-    Binding repliesBinding(TopicExchange exchange,Queue replyQueue) {
-        return BindingBuilder.bind(replyQueue).to(exchange).with(AppConstant.QUEUE_REPLY);
-    }
-
-    @Bean
-    Binding requestBinding(TopicExchange exchange,Queue requestQueue) {
-        return BindingBuilder.bind(requestQueue).to(exchange).with(AppConstant.QUEUE_REQUEST);
-    }
-
     @Bean
     public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory) {
         var simpleMessageListenerContainer = new SimpleMessageListenerContainer(connectionFactory);
@@ -52,16 +36,6 @@ public class WorkerConfig {
         simpleMessageListenerContainer.setQueueNames(AppConstant.QUEUE_REQUEST);
 
         return simpleMessageListenerContainer;
-    }
-
-    @Bean
-    public DirectChannel request() {
-        return new DirectChannel();
-    }
-
-    @Bean
-    public DirectChannel reply() {
-        return new DirectChannel();
     }
 
 
@@ -84,10 +58,11 @@ public class WorkerConfig {
 //                .get();
 //    }
     @Bean
-    public IntegrationFlow mesagesIn(ConnectionFactory connectionFactory,SimpleMessageListenerContainer messageListenerContainer) {
+    public IntegrationFlow mesagesIn(SimpleMessageListenerContainer messageListenerContainer,
+                                     DirectChannel request) {
         return IntegrationFlow
                 .from(Amqp.inboundAdapter(messageListenerContainer))
-                .channel(request())
+                .channel(request)
                 .get();
     }
 
