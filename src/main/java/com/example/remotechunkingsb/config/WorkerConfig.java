@@ -26,18 +26,6 @@ public class WorkerConfig {
     }
 
 
-    @Bean
-    public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory) {
-        var simpleMessageListenerContainer = new SimpleMessageListenerContainer(connectionFactory);
-        simpleMessageListenerContainer.setConcurrentConsumers(1);
-        simpleMessageListenerContainer.setPrefetchCount(1);
-        simpleMessageListenerContainer.setIdleEventInterval(10000);
-        simpleMessageListenerContainer.setListenerId("queue");
-        simpleMessageListenerContainer.setQueueNames(AppConstant.QUEUE_REQUEST);
-
-        return simpleMessageListenerContainer;
-    }
-
 
     @Bean
     public SimpleMessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory) {
