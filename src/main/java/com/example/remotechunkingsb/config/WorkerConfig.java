@@ -3,17 +3,10 @@ package com.example.remotechunkingsb.config;
 import com.example.remotechunkingsb.model.CustomChunkProcessor;
 import com.example.remotechunkingsb.model.Student;
 import com.example.remotechunkingsb.util.AppConstant;
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Connection;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.batch.core.step.item.ChunkProcessor;
-import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -41,12 +34,12 @@ public class WorkerConfig {
 
     @Bean
     Binding repliesBinding(TopicExchange exchange,Queue replyQueue) {
-        return BindingBuilder.bind(replyQueue).to(exchange).with(AppConstant.REPLY);
+        return BindingBuilder.bind(replyQueue).to(exchange).with(AppConstant.QUEUE_REPLY);
     }
 
     @Bean
     Binding requestBinding(TopicExchange exchange,Queue requestQueue) {
-        return BindingBuilder.bind(requestQueue).to(exchange).with(AppConstant.REQUEST);
+        return BindingBuilder.bind(requestQueue).to(exchange).with(AppConstant.QUEUE_REQUEST);
     }
 
     @Bean
@@ -56,7 +49,7 @@ public class WorkerConfig {
         simpleMessageListenerContainer.setPrefetchCount(1);
         simpleMessageListenerContainer.setIdleEventInterval(10000);
         simpleMessageListenerContainer.setListenerId("queue");
-        simpleMessageListenerContainer.setQueueNames(AppConstant.REQUEST);
+        simpleMessageListenerContainer.setQueueNames(AppConstant.QUEUE_REQUEST);
 
         return simpleMessageListenerContainer;
     }
@@ -79,7 +72,7 @@ public class WorkerConfig {
         container.setPrefetchCount(1);
         container.setIdleEventInterval(10000);
         container.setListenerId("queue");
-        container.setQueueNames("request");
+        container.setQueueNames(AppConstant.QUEUE_REQUEST);
 
         return container;
     }
@@ -108,14 +101,14 @@ public class WorkerConfig {
 
     @Bean
     public IntegrationFlow outgoingReplies(AmqpTemplate template) {
-        return IntegrationFlow.from(AppConstant.REPLY)
+        return IntegrationFlow.from(AppConstant.CHANNEL_REPLY)
                 .handle(Amqp.outboundAdapter(template)
-                        .routingKey(AppConstant.REPLY))
+                        .routingKey(AppConstant.QUEUE_REPLY))
                 .get();
     }
 
     @Bean
-    @ServiceActivator(inputChannel = AppConstant.REQUEST, outputChannel = AppConstant.REPLY, autoStartup = "true")
+    @ServiceActivator(inputChannel = AppConstant.CHANNEL_REQUEST, outputChannel = AppConstant.CHANNEL_REPLY, autoStartup = "true")
     public ChunkProcessorChunkHandler<Student> chunkProcessorChunkHandler() {
         ChunkProcessorChunkHandler<Student> chunkHandler = new ChunkProcessorChunkHandler<>();
         chunkHandler.setChunkProcessor(customChunkProcessor);
@@ -129,14 +122,5 @@ public class WorkerConfig {
         return chunkHandler;
     }
 
-    @Bean
-    public ItemWriter<Student> itemWriter() {
 
-        return new ItemWriter<Student>() {
-            @Override
-            public void write(Chunk<? extends Student> chunk) throws Exception {
-                //chunk.getItems().forEach(System.out::println);
-            }
-        };
-    }
 }

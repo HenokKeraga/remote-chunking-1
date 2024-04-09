@@ -13,10 +13,10 @@ public class RabbitQueueConfiguration {
 
     @Bean
     public Queue requestQueue(){
-        return new Queue(AppConstant.REQUEST,false);
+        return new Queue(AppConstant.QUEUE_REQUEST,false);
     }
     @Bean
     public Queue replyQueue(){
-        return  new Queue(AppConstant.REPLY,false);
+        return  new Queue(AppConstant.QUEUE_REPLY,false);
     }
 }

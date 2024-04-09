@@ -14,6 +14,7 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.item.SimpleChunkProvider;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter;
 import org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean;
@@ -21,13 +22,16 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.batch.repeat.RepeatCallback;
+import org.springframework.batch.repeat.RepeatException;
+import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.ExecutorChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -79,6 +83,20 @@ public class JobMasterConfig {
     }
 
     @Bean
+    public SimpleChunkProvider<Student> simpleChunkProvider(ItemReader<Student> itemReader){
+        var objectSimpleChunkProvider = new SimpleChunkProvider<Student>(itemReader, new RepeatOperations() {
+            @Override
+            public RepeatStatus iterate(RepeatCallback callback) throws RepeatException {
+                return RepeatStatus.FINISHED;
+            }
+        });
+
+
+        return objectSimpleChunkProvider;
+
+    }
+
+    @Bean
     public TaskletStep prcPacProcessStep(ItemReader<Student> itemReader,
                                          ItemWriter<Student> itemWriter,
                                          ThreadPoolTaskExecutor pacTheadPoolTaskExecutor) {
@@ -119,7 +137,7 @@ public class JobMasterConfig {
     public QueueChannel reply() {
         return new QueueChannel();
     }
-
+// configure messaging gateway
     @Bean
     public MessagingTemplate messagingTemplate() {
         MessagingTemplate template = new MessagingTemplate();
@@ -142,16 +160,16 @@ public class JobMasterConfig {
     @Bean
     public IntegrationFlow replyFlow(ConnectionFactory connectionFactory) {
         return IntegrationFlow
-                .from(Amqp.inboundAdapter(connectionFactory, AppConstant.REPLY))
+                .from(Amqp.inboundAdapter(connectionFactory, AppConstant.QUEUE_REPLY))
                 .channel(reply())
                 .get();
     }
 
     @Bean
     public IntegrationFlow outboundFlow(AmqpTemplate amqpTemplate) {
-        return IntegrationFlow.from(AppConstant.REQUEST)
+        return IntegrationFlow.from(AppConstant.CHANNEL_REQUEST)
                 .handle(Amqp.outboundAdapter(amqpTemplate)
-                        .routingKey(AppConstant.REQUEST))
+                        .routingKey(AppConstant.QUEUE_REQUEST))
                 .get();
     }
     @Bean
@@ -173,5 +191,16 @@ public class JobMasterConfig {
         remoteChunkHandlerFactoryBean.setStep(prcPacProcessStep);
         return remoteChunkHandlerFactoryBean;
     }
+
+//    @Bean
+//    public ItemWriter<Student> gitemWriter() {
+//
+//        return new ItemWriter<Student>() {
+//            @Override
+//            public void write(Chunk<? extends Student> chunk) throws Exception {
+//                chunk.getItems().forEach(System.out::println);
+//            }
+//        };
+//    }
 
 }
