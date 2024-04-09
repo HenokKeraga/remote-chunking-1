@@ -55,7 +55,8 @@ public class WorkerConfig {
     public IntegrationFlow messageOut(AmqpTemplate template) {
         return IntegrationFlow.from(AppConstant.CHANNEL_REPLY)
                 .handle(Amqp.outboundAdapter(template)
-                        .routingKey(AppConstant.REPLY_QUEUE))
+                        .exchangeName("remote-chunking-exchange")
+                        .routingKey(AppConstant.REP_KEY))
                 .get();
     }
 

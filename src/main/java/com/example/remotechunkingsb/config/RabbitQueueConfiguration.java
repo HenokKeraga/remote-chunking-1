@@ -42,12 +42,12 @@ public class RabbitQueueConfiguration {
 
     @Bean
     Binding repliesBinding(TopicExchange exchange, Queue replyQueue) {
-        return BindingBuilder.bind(replyQueue).to(exchange).with(AppConstant.REPLY_QUEUE);
+        return BindingBuilder.bind(replyQueue).to(exchange).with(AppConstant.REP_KEY);
     }
 
     @Bean
     Binding requestBinding(TopicExchange exchange, Queue requestQueue) {
-        return BindingBuilder.bind(requestQueue).to(exchange).with(AppConstant.REQUEST_QUEUE);
+        return BindingBuilder.bind(requestQueue).to(exchange).with(AppConstant.REQ_KEY);
     }
 
     // configure messaging gateway

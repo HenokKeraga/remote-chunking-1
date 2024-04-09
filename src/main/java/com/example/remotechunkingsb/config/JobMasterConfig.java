@@ -153,7 +153,8 @@ public class JobMasterConfig {
     public IntegrationFlow messageOut(AmqpTemplate amqpTemplate) {
         return IntegrationFlow.from(AppConstant.CHANNEL_REQUEST)
                 .handle(Amqp.outboundAdapter(amqpTemplate)
-                        .routingKey(AppConstant.REQUEST_QUEUE))
+                        .exchangeName("remote-chunking-exchange")
+                        .routingKey(AppConstant.REQ_KEY))
                 .get();
     }
     @Bean

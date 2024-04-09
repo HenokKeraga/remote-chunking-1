@@ -8,7 +8,8 @@ public class AppConstant {
     public  static final String CHANNEL_REPLY = "reply";
 
 
-    public  static final String KEY= "key";
+    public  static final String REQ_KEY= "requestKey";
+    public  static final String REP_KEY= "replyKey";
 
 
 
